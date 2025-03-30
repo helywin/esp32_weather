@@ -2,4 +2,3 @@ build
 /ui
 /managed_components
 !/managed_components/lv_conf.h
-/node_modules

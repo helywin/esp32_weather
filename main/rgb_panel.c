@@ -15,66 +15,64 @@
 #include "lv_demos.h"
 
 #include "esp_lcd_touch_gt911.h"
-#include "esp_lcd_st7701.h"
 
 /* LCD size */
-#define LCD_H_RES   (480)
-#define LCD_V_RES   (854)
+#define EXAMPLE_LCD_H_RES   (800)
+#define EXAMPLE_LCD_V_RES   (480)
 
 /* LCD settings */
-#define LCD_LVGL_FULL_REFRESH           (1)
-#define LCD_LVGL_DIRECT_MODE            (0)
-#define LCD_LVGL_AVOID_TEAR             (1)
-#define LCD_RGB_BOUNCE_BUFFER_MODE      (0)
-#define LCD_DRAW_BUFF_DOUBLE            (1)
-#define LCD_DRAW_BUFF_HEIGHT            (100)
-#define LCD_RGB_BUFFER_NUMS             (2)
-#define LCD_RGB_BOUNCE_BUFFER_HEIGHT    (10)
+#define EXAMPLE_LCD_LVGL_FULL_REFRESH           (1)
+#define EXAMPLE_LCD_LVGL_DIRECT_MODE            (0)
+#define EXAMPLE_LCD_LVGL_AVOID_TEAR             (1)
+#define EXAMPLE_LCD_RGB_BOUNCE_BUFFER_MODE      (1)
+#define EXAMPLE_LCD_DRAW_BUFF_DOUBLE            (1)
+#define EXAMPLE_LCD_DRAW_BUFF_HEIGHT            (100)
+#define EXAMPLE_LCD_RGB_BUFFER_NUMS             (2)
+#define EXAMPLE_LCD_RGB_BOUNCE_BUFFER_HEIGHT    (10)
 
 /* LCD pins */
-#define LCD_GPIO_BL        (GPIO_NUM_1)
-#define LCD_GPIO_RST       (GPIO_NUM_NC)
-#define LCD_GPIO_VSYNC     (GPIO_NUM_2)
-#define LCD_GPIO_HSYNC     (GPIO_NUM_4)
-#define LCD_GPIO_DE        (GPIO_NUM_5)
-#define LCD_GPIO_PCLK      (GPIO_NUM_6)
-#define LCD_GPIO_DISP      (GPIO_NUM_NC)
-#define LCD_GPIO_DATA0     (GPIO_NUM_7)
-#define LCD_GPIO_DATA1     (GPIO_NUM_15)
-#define LCD_GPIO_DATA2     (GPIO_NUM_16)
-#define LCD_GPIO_DATA3     (GPIO_NUM_8)
-#define LCD_GPIO_DATA4     (GPIO_NUM_3)
-#define LCD_GPIO_DATA5     (GPIO_NUM_46)
-#define LCD_GPIO_DATA6     (GPIO_NUM_9)
-#define LCD_GPIO_DATA7     (GPIO_NUM_10)
-#define LCD_GPIO_DATA8     (GPIO_NUM_11)
-#define LCD_GPIO_DATA9     (GPIO_NUM_12)
-#define LCD_GPIO_DATA10    (GPIO_NUM_13)
-#define LCD_GPIO_DATA11    (GPIO_NUM_14)
-#define LCD_GPIO_DATA12    (GPIO_NUM_21)
-#define LCD_GPIO_DATA13    (GPIO_NUM_47)
-#define LCD_GPIO_DATA14    (GPIO_NUM_48)
-#define LCD_GPIO_DATA15    (GPIO_NUM_45)
+#define EXAMPLE_LCD_GPIO_VSYNC     (GPIO_NUM_3)
+#define EXAMPLE_LCD_GPIO_HSYNC     (GPIO_NUM_46)
+#define EXAMPLE_LCD_GPIO_DE        (GPIO_NUM_5)
+#define EXAMPLE_LCD_GPIO_PCLK      (GPIO_NUM_7)
+#define EXAMPLE_LCD_GPIO_DISP      (GPIO_NUM_NC)
+#define EXAMPLE_LCD_GPIO_DATA0     (GPIO_NUM_14)
+#define EXAMPLE_LCD_GPIO_DATA1     (GPIO_NUM_38)
+#define EXAMPLE_LCD_GPIO_DATA2     (GPIO_NUM_18)
+#define EXAMPLE_LCD_GPIO_DATA3     (GPIO_NUM_17)
+#define EXAMPLE_LCD_GPIO_DATA4     (GPIO_NUM_10)
+#define EXAMPLE_LCD_GPIO_DATA5     (GPIO_NUM_39)
+#define EXAMPLE_LCD_GPIO_DATA6     (GPIO_NUM_0)
+#define EXAMPLE_LCD_GPIO_DATA7     (GPIO_NUM_45)
+#define EXAMPLE_LCD_GPIO_DATA8     (GPIO_NUM_48)
+#define EXAMPLE_LCD_GPIO_DATA9     (GPIO_NUM_47)
+#define EXAMPLE_LCD_GPIO_DATA10    (GPIO_NUM_21)
+#define EXAMPLE_LCD_GPIO_DATA11    (GPIO_NUM_1)
+#define EXAMPLE_LCD_GPIO_DATA12    (GPIO_NUM_2)
+#define EXAMPLE_LCD_GPIO_DATA13    (GPIO_NUM_42)
+#define EXAMPLE_LCD_GPIO_DATA14    (GPIO_NUM_41)
+#define EXAMPLE_LCD_GPIO_DATA15    (GPIO_NUM_40)
 
 /* Touch settings */
-#define TOUCH_I2C_NUM       (I2C_NUM_0)
-#define TOUCH_I2C_CLK_HZ    (400000)
+#define EXAMPLE_TOUCH_I2C_NUM       (0)
+#define EXAMPLE_TOUCH_I2C_CLK_HZ    (400000)
 
 /* LCD touch pins */
-#define TOUCH_I2C_SCL       (GPIO_NUM_41)
-#define TOUCH_I2C_SDA       (GPIO_NUM_42)
+#define EXAMPLE_TOUCH_I2C_SCL       (GPIO_NUM_9)
+#define EXAMPLE_TOUCH_I2C_SDA       (GPIO_NUM_8)
 
-#define LCD_PANEL_35HZ_RGB_TIMING()  \
+#define EXAMPLE_LCD_PANEL_35HZ_RGB_TIMING()  \
     {                                               \
-        .pclk_hz = 12 * 1000 * 1000,                \
-        .h_res = LCD_H_RES,                 \
-        .v_res = LCD_V_RES,                 \
-        .hsync_pulse_width = 6,                    \
-        .hsync_back_porch = 30,                     \
-        .hsync_front_porch = 12,                    \
-        .vsync_pulse_width = 1,                     \
-        .vsync_back_porch = 30,                     \
-        .vsync_front_porch = 12,                    \
+        .pclk_hz = 18 * 1000 * 1000,                \
+        .h_res = EXAMPLE_LCD_H_RES,                 \
+        .v_res = EXAMPLE_LCD_V_RES,                 \
+        .hsync_pulse_width = 40,                    \
+        .hsync_back_porch = 40,                     \
+        .hsync_front_porch = 48,                    \
+        .vsync_pulse_width = 23,                    \
+        .vsync_back_porch = 32,                     \
+        .vsync_front_porch = 13,                    \
+        .flags.pclk_active_neg = true,              \
     }
 
 static const char *TAG = "EXAMPLE";
@@ -97,38 +95,38 @@ static esp_err_t app_lcd_init(void)
     /* LCD initialization */
     ESP_LOGI(TAG, "Initialize RGB panel");
     esp_lcd_rgb_panel_config_t panel_conf = {
-        .clk_src = SOC_MOD_CLK_PLL_F160M,
+        .clk_src = LCD_CLK_SRC_PLL160M,
         .psram_trans_align = 64,
         .data_width = 16,
         .bits_per_pixel = 16,
-        .de_gpio_num = LCD_GPIO_DE,
-        .pclk_gpio_num = LCD_GPIO_PCLK,
-        .vsync_gpio_num = LCD_GPIO_VSYNC,
-        .hsync_gpio_num = LCD_GPIO_HSYNC,
-        .disp_gpio_num = LCD_GPIO_DISP,
+        .de_gpio_num = EXAMPLE_LCD_GPIO_DE,
+        .pclk_gpio_num = EXAMPLE_LCD_GPIO_PCLK,
+        .vsync_gpio_num = EXAMPLE_LCD_GPIO_VSYNC,
+        .hsync_gpio_num = EXAMPLE_LCD_GPIO_HSYNC,
+        .disp_gpio_num = EXAMPLE_LCD_GPIO_DISP,
         .data_gpio_nums = {
-            LCD_GPIO_DATA0,
-            LCD_GPIO_DATA1,
-            LCD_GPIO_DATA2,
-            LCD_GPIO_DATA3,
-            LCD_GPIO_DATA4,
-            LCD_GPIO_DATA5,
-            LCD_GPIO_DATA6,
-            LCD_GPIO_DATA7,
-            LCD_GPIO_DATA8,
-            LCD_GPIO_DATA9,
-            LCD_GPIO_DATA10,
-            LCD_GPIO_DATA11,
-            LCD_GPIO_DATA12,
-            LCD_GPIO_DATA13,
-            LCD_GPIO_DATA14,
-            LCD_GPIO_DATA15,
+            EXAMPLE_LCD_GPIO_DATA0,
+            EXAMPLE_LCD_GPIO_DATA1,
+            EXAMPLE_LCD_GPIO_DATA2,
+            EXAMPLE_LCD_GPIO_DATA3,
+            EXAMPLE_LCD_GPIO_DATA4,
+            EXAMPLE_LCD_GPIO_DATA5,
+            EXAMPLE_LCD_GPIO_DATA6,
+            EXAMPLE_LCD_GPIO_DATA7,
+            EXAMPLE_LCD_GPIO_DATA8,
+            EXAMPLE_LCD_GPIO_DATA9,
+            EXAMPLE_LCD_GPIO_DATA10,
+            EXAMPLE_LCD_GPIO_DATA11,
+            EXAMPLE_LCD_GPIO_DATA12,
+            EXAMPLE_LCD_GPIO_DATA13,
+            EXAMPLE_LCD_GPIO_DATA14,
+            EXAMPLE_LCD_GPIO_DATA15,
         },
-        .timings = LCD_PANEL_35HZ_RGB_TIMING(),
+        .timings = EXAMPLE_LCD_PANEL_35HZ_RGB_TIMING(),
         .flags.fb_in_psram = 1,
-        .num_fbs = LCD_RGB_BUFFER_NUMS,
-#if LCD_RGB_BOUNCE_BUFFER_MODE
-        .bounce_buffer_size_px = LCD_H_RES * LCD_RGB_BOUNCE_BUFFER_HEIGHT,
+        .num_fbs = EXAMPLE_LCD_RGB_BUFFER_NUMS,
+#if EXAMPLE_LCD_RGB_BOUNCE_BUFFER_MODE
+        .bounce_buffer_size_px = EXAMPLE_LCD_H_RES * EXAMPLE_LCD_RGB_BOUNCE_BUFFER_HEIGHT,
 #endif
     };
     ESP_GOTO_ON_ERROR(esp_lcd_new_rgb_panel(&panel_conf, &lcd_panel), err, TAG, "RGB init failed");
@@ -146,23 +144,21 @@ err:
 static esp_err_t app_touch_init(void)
 {
     /* Initilize I2C */
-    ESP_LOGI(TAG, "Initialize I2C");
     const i2c_config_t i2c_conf = {
         .mode = I2C_MODE_MASTER,
-        .sda_io_num = TOUCH_I2C_SDA,
-        .sda_pullup_en = GPIO_PULLUP_ENABLE,
-        .scl_io_num = TOUCH_I2C_SCL,
-        .scl_pullup_en = GPIO_PULLUP_ENABLE,
-        .master.clk_speed = TOUCH_I2C_CLK_HZ
+        .sda_io_num = EXAMPLE_TOUCH_I2C_SDA,
+        .sda_pullup_en = GPIO_PULLUP_DISABLE,
+        .scl_io_num = EXAMPLE_TOUCH_I2C_SCL,
+        .scl_pullup_en = GPIO_PULLUP_DISABLE,
+        .master.clk_speed = EXAMPLE_TOUCH_I2C_CLK_HZ
     };
-    ESP_RETURN_ON_ERROR(i2c_param_config(TOUCH_I2C_NUM, &i2c_conf), TAG, "I2C configuration failed");
-    ESP_RETURN_ON_ERROR(i2c_driver_install(TOUCH_I2C_NUM, i2c_conf.mode, 0, 0, 0), TAG, "I2C initialization failed");
+    ESP_RETURN_ON_ERROR(i2c_param_config(EXAMPLE_TOUCH_I2C_NUM, &i2c_conf), TAG, "I2C configuration failed");
+    ESP_RETURN_ON_ERROR(i2c_driver_install(EXAMPLE_TOUCH_I2C_NUM, i2c_conf.mode, 0, 0, 0), TAG, "I2C initialization failed");
 
     /* Initialize touch HW */
-    ESP_LOGI(TAG, "Initialize touch panel");
     const esp_lcd_touch_config_t tp_cfg = {
-        .x_max = LCD_H_RES,
-        .y_max = LCD_V_RES,
+        .x_max = EXAMPLE_LCD_H_RES,
+        .y_max = EXAMPLE_LCD_V_RES,
         .rst_gpio_num = GPIO_NUM_NC,
         .int_gpio_num = GPIO_NUM_NC,
         .levels = {
@@ -175,10 +171,9 @@ static esp_err_t app_touch_init(void)
             .mirror_y = 0,
         },
     };
-    ESP_LOGI(TAG, "Initialize GT911 touch panel via I2C");
     esp_lcd_panel_io_handle_t tp_io_handle = NULL;
     const esp_lcd_panel_io_i2c_config_t tp_io_config = ESP_LCD_TOUCH_IO_I2C_GT911_CONFIG();
-    ESP_RETURN_ON_ERROR(esp_lcd_new_panel_io_i2c((esp_lcd_i2c_bus_handle_t)TOUCH_I2C_NUM, &tp_io_config, &tp_io_handle), TAG, "");
+    ESP_RETURN_ON_ERROR(esp_lcd_new_panel_io_i2c((esp_lcd_i2c_bus_handle_t)EXAMPLE_TOUCH_I2C_NUM, &tp_io_config, &tp_io_handle), TAG, "");
     return esp_lcd_touch_new_i2c_gt911(tp_io_handle, &tp_cfg, &touch_handle);
 }
 
@@ -194,9 +189,9 @@ static esp_err_t app_lvgl_init(void)
     };
     ESP_RETURN_ON_ERROR(lvgl_port_init(&lvgl_cfg), TAG, "LVGL port initialization failed");
 
-    uint32_t buff_size = LCD_H_RES * LCD_DRAW_BUFF_HEIGHT;
-#if LCD_LVGL_FULL_REFRESH || LCD_LVGL_DIRECT_MODE
-    buff_size = LCD_H_RES * LCD_V_RES;
+    uint32_t buff_size = EXAMPLE_LCD_H_RES * EXAMPLE_LCD_DRAW_BUFF_HEIGHT;
+#if EXAMPLE_LCD_LVGL_FULL_REFRESH || EXAMPLE_LCD_LVGL_DIRECT_MODE
+    buff_size = EXAMPLE_LCD_H_RES * EXAMPLE_LCD_V_RES;
 #endif
 
     /* Add LCD screen */
@@ -204,9 +199,9 @@ static esp_err_t app_lvgl_init(void)
     const lvgl_port_display_cfg_t disp_cfg = {
         .panel_handle = lcd_panel,
         .buffer_size = buff_size,
-        .double_buffer = LCD_DRAW_BUFF_DOUBLE,
-        .hres = LCD_H_RES,
-        .vres = LCD_V_RES,
+        .double_buffer = EXAMPLE_LCD_DRAW_BUFF_DOUBLE,
+        .hres = EXAMPLE_LCD_H_RES,
+        .vres = EXAMPLE_LCD_V_RES,
         .monochrome = false,
 #if LVGL_VERSION_MAJOR >= 9
         .color_format = LV_COLOR_FORMAT_RGB565,
@@ -219,9 +214,9 @@ static esp_err_t app_lvgl_init(void)
         .flags = {
             .buff_dma = false,
             .buff_spiram = false,
-#if LCD_LVGL_FULL_REFRESH
+#if EXAMPLE_LCD_LVGL_FULL_REFRESH
             .full_refresh = true,
-#elif LCD_LVGL_DIRECT_MODE
+#elif EXAMPLE_LCD_LVGL_DIRECT_MODE
             .direct_mode = true,
 #endif
 #if LVGL_VERSION_MAJOR >= 9
@@ -232,12 +227,12 @@ static esp_err_t app_lvgl_init(void)
     };
     const lvgl_port_display_rgb_cfg_t rgb_cfg = {
         .flags = {
-#if LCD_RGB_BOUNCE_BUFFER_MODE
+#if EXAMPLE_LCD_RGB_BOUNCE_BUFFER_MODE
             .bb_mode = true,
 #else
             .bb_mode = false,
 #endif
-#if LCD_LVGL_AVOID_TEAR
+#if EXAMPLE_LCD_LVGL_AVOID_TEAR
             .avoid_tearing = true,
 #else
             .avoid_tearing = false,
