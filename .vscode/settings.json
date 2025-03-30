@@ -1,0 +1,24 @@
+{
+    "C_Cpp.intelliSenseEngine": "default",
+    "idf.espIdfPathWin": "D:\\esp\\v5.4\\esp-idf",
+    "idf.openOcdConfigs": [
+        "interface/ftdi/esp32_devkitj_v1.cfg",
+        "target/esp32.cfg"
+    ],
+    "idf.portWin": "COM9",
+    "idf.toolsPathWin": "D:\\.espressif",
+    "idf.flashType": "UART",
+    "files.associations": {
+        "lvgl.h": "c",
+        "array": "c",
+        "string": "c",
+        "string_view": "c",
+        "span": "c",
+        "i2c.h": "c",
+        "lvgl_private.h": "c",
+        "i2c_master.h": "c",
+        "gpio_types.h": "c",
+        "esp_lcd_touch_gt911.h": "c",
+        "esp_lcd_st7701.h": "c"
+    }
+}

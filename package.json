@@ -1,0 +1,15 @@
+{
+  "name": "LCD_UI",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "node ./build_fonts.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "lv_font_conv": "^1.5.3"
+  }
+}
